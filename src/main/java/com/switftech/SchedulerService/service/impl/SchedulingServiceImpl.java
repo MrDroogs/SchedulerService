@@ -1,84 +1,45 @@
 package com.switftech.SchedulerService.service.impl;
 
-import com.switftech.SchedulerService.repository.ConfigRepo;
+import com.switftech.SchedulerService.dto.Request.EventRequest;
+import com.switftech.SchedulerService.model.Event;
+import com.switftech.SchedulerService.model.Status;
+import com.switftech.SchedulerService.repository.EventRepository;
 import com.switftech.SchedulerService.service.SchedulingService;
+import com.switftech.SchedulerService.util.EventScheduler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.concurrent.ScheduledFuture;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class SchedulingServiceImpl implements SchedulingService {
 
-    private final ConfigRepo configRepo;
-    private final SchedulingConfigurer configurer;
+    private final EventRequest eventRequest;
+    private final EventRepository eventRepository;
+    private final EventScheduler eventScheduler;
     private ScheduledTaskRegistrar scheduledTaskRegistrar;
 
-    Map<String, ScheduledFuture> futureMap = new HashMap<>();
 
-    @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        if (scheduledTaskRegistrar == null) {
-            scheduledTaskRegistrar = taskRegistrar;
+    @Scheduled(cron = "0/5 * * * * ?")
+    public String sendMessage(EventRequest eventRequest) {
+        Event event = eventRepository.findByStatus(Status.SCHEDULED);
+        LocalDateTime createdAt = LocalDateTime.now();
+        if (LocalDateTime.now()
+                .isAfter(event.getCreatedAt())) {
+            event.setStatus(Status.PENDING);
+            return "Time has already passed";
 
-        }
-        if (taskRegistrar.getScheduler() == null) {
-            taskRegistrar.setScheduler(poolScheduler());
-        }
+        } else
+            event.setStatus(Status.SCHEDULED);
+        event.setCreatedAt(eventRequest.getCreatedAt());
+        event.setDateTime(eventRequest.getEventDateTime());
+        eventRepository.save(event);
+        return "message sent successfully";
     }
 
-    @Override
-    public boolean addJob(String jobName) {
-        if (futureMap.containsKey(jobName)) {
-            return false;
-        }
-        ScheduledFuture future = scheduledTaskRegistrar.getScheduler()
-                .schedule(() -> methodToBeExecuted(), t -> {
-                    Calendar nextExecutionTime = new GregorianCalendar();
-                    Date lastActualExecutionTime = t.lastActualExecutionTime();
-                    nextExecutionTime.setTime(lastActualExecutionTime != null ? lastActualExecutionTime : new Date());
-                    nextExecutionTime.add(Calendar.SECOND, 5);
-                    return nextExecutionTime.getTime()
-                            .toInstant();
-
-                });
-        configureTasks(scheduledTaskRegistrar);
-        futureMap.put(jobName, future);
-        return true;
-    }
-
-    @Override
-    public boolean removeJob(String name) {
-        if (futureMap.containsKey(name)) {
-            return false;
-        }
-        ScheduledFuture scheduledFuture = futureMap.get(name);
-        scheduledFuture.cancel(true);
-        futureMap.remove(name);
-        return true;
-
-    }
-
-    @Override
-    public String methodToBeExecuted() {
-
-        return null;
-    }
-
-    @Bean
-    public TaskScheduler poolScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
-        scheduler.setPoolSize(1);
-        scheduler.initialize();
-        return scheduler;
-    }
 
 }
 

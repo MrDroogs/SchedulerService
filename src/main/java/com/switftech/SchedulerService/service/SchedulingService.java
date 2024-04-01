@@ -1,13 +1,9 @@
 package com.switftech.SchedulerService.service;
 
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-
-
+import com.switftech.SchedulerService.dto.Request.EventRequest;
 
 public interface SchedulingService {
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar);
-    public boolean addJob(String jobName);
-    public boolean removeJob(String name);
-    public String methodToBeExecuted();
+    public String sendMessage(EventRequest eventRequest);
+
 
 }
