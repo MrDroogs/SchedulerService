@@ -1,5 +1,7 @@
 package com.switftech.SchedulerService.model;
 
-public enum Status {
+
+
+public enum Status  {
   SCHEDULED,COMPLETED,PENDING
 }

@@ -1,4 +1,4 @@
-
+server.port: 8081
 datasource:
   url: jdbc:postgresql://localhost:5432/SchedulerService
   username: postgres
@@ -9,3 +9,6 @@ jpa:
   hibernate:
     ddl-auto: update
     dialect: org.hibernate.dialect.PostgresSQLDialect
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
