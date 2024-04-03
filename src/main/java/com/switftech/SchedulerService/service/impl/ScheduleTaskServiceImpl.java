@@ -16,6 +16,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,18 +32,17 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
 
     @Scheduled(fixedDelay = 5000)
     public void ScheduleTaskService() {
-
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setThreadNamePrefix(THREAD_NAME_PREFIX);
         scheduler.setPoolSize(POOL_SIZE);
         scheduler.initialize();
-
         this.taskScheduler = scheduler;
     }
 
     @EventListener({ ContextRefreshedEvent.class })
     void contextRefreshedEvent() {
-        for (Event message : eventRepository.findAll()) {
+        List<Event> scheduledEvents = (List<Event>) eventRepository.findByStatus(Status.SCHEDULED);
+        for (Event message : scheduledEvents) {
             schedule(MessageTask.build(message));
         }
     }
@@ -51,8 +52,7 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
             return eventResponse.exception("The task is not correct");
         else {
             taskScheduler.schedule(task.getRunnable(), task.getScheduleTime());
-            System.out.println("Message scheduled at " + task.getScheduleTime()
-                    .toString());
+            System.out.println("Message scheduled at " + task.getScheduleTime().toString());
             return eventResponse.accepted("task is scheduled");
         }
     }
@@ -66,17 +66,13 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
     public Optional<Event> findById(long id) {
         return eventRepository.findById(id);
     }
-//    @Scheduled(initialDelay = 5000)
-//    @Override
-//    public void scheduleMessage(EventRequest eventRequest) {
-//        Event event=eventRepository.findByStatus(Status.SCHEDULED);
-//        if (event.isScheduled() )
-//
-//    }
 
+    @Scheduled(cron = "0 0 5 * * ?")
+    public void scheduleMessagesAtFiveAM() {
+        List<Event> messages = eventRepository.findAllByStatusAndScheduledTime(Status.SCHEDULED, LocalTime.of(5, 0));
+        for (Event message : messages) {
+            schedule(MessageTask.build(message));
+        }
+
+    }
 }
-
-
-
-
-
