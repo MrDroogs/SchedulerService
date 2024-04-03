@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Event {
 
     @Id
-    private UUID id;
+    private Long id;
     private int hour;
     private int minute;
     private int second;

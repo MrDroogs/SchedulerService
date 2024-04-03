@@ -11,9 +11,5 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event,Long> {
 
-    Event findDateTime();
 
-    Event findByStatus(Status status);
-
-    List<Event> findAllByStatusAndScheduledTime(Status status, LocalTime of);
 }
