@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 @Getter
 @Setter
@@ -15,5 +16,6 @@ public class EventRequest {
     private boolean isScheduled;
     private LocalDateTime createdAt;
     private LocalDateTime eventDateTime;
+    private TimeZone timeZone;
 
 }

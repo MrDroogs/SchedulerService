@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 import java.util.UUID;
 
 @Setter
@@ -24,5 +25,6 @@ public class Event extends BaseAuditEntity {
     private boolean isScheduled;
     private LocalDateTime createdAt;
     private LocalDateTime dateTime;
+    private TimeZone timeZone;
     private String message;
 }
