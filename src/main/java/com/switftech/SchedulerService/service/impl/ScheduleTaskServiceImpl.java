@@ -2,12 +2,12 @@ package com.switftech.SchedulerService.service.impl;
 
 import com.switftech.SchedulerService.dto.Request.EventRequest;
 import com.switftech.SchedulerService.service.ScheduleTaskService;
-import com.switftech.SchedulerService.util.EventScheduler;
+
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -19,14 +19,11 @@ import java.util.UUID;
 public class ScheduleTaskServiceImpl implements ScheduleTaskService {
     private static Logger logger = LoggerFactory.getLogger(ScheduleTaskServiceImpl.class);
 
-    private boolean enabled = true;
+
 
     private final Scheduler scheduler;
 
-    @Value("${notification.enabled}")
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+
     public void scheduleEvent(EventRequest eventRequest) {
         try {
             ZonedDateTime dateTime = ZonedDateTime.of(eventRequest.getEventDateTime(), eventRequest.getTimeZone().toZoneId());
