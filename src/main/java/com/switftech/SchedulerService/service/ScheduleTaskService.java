@@ -1,5 +1,10 @@
 package com.switftech.SchedulerService.service;
 
 public interface ScheduleTaskService {
-    void scheduleTasks();
+    static void preprocess() {
+    }
+
+    static void scheduleTasks() {
+
+    }
 }

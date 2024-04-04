@@ -1,43 +1,58 @@
 package com.switftech.SchedulerService.service.impl;
 
-import com.switftech.SchedulerService.model.Event;
 import com.switftech.SchedulerService.service.ScheduleTaskService;
+import com.switftech.SchedulerService.util.EventScheduler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 
 @RequiredArgsConstructor
-
-
 @Service
 public class ScheduleTaskServiceImpl implements ScheduleTaskService {
+    private static Logger logger = LoggerFactory
+            .getLogger(EventScheduler.class);
 
-    private final String MESSAGE_MANAGEMENT_API_URL = "http://message-management-service-api/messages"; // Replace with the actual URL of the MessageManagementService
-    private final WebClient webClient;
+    private boolean enabled = true;
 
-    @Autowired
-    public ScheduleTaskServiceImpl(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(MESSAGE_MANAGEMENT_API_URL).build();
+    //every 5 seconds
+     // @Scheduled(cron = "0/5 * * * * ?")
+    public void preprocess() {
+        if (!enabled) {
+            return;
+        }
+
+        try {
+            ScheduleTaskService.preprocess();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
     }
 
-    // Scheduled to run every hour
-    @Override
-    @Scheduled(cron = "0 0 * * * *")
-    public void scheduleTasks() {
-        webClient.get()
-                .retrieve()
-                .bodyToMono(Event[].class)
-                .subscribe(tasks -> {
-                    for (Event task : tasks) {
-                        // Handle scheduling logic here
-                        System.out.println("Scheduling task: " + task.getId());
-                    }
-                }, error -> {
-                    // Handle API call failure
-                    System.err.println("Failed to fetch tasks from the API: " + error.getMessage());
-                });
+    // every 10 seconds
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void sendMessages() {
+        if (!enabled) {
+            return;
+        }
+
+        logger.debug("start");
+
+        try {
+            ScheduleTaskService.scheduleTasks();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        logger.debug("end");
+    }
+    @Value("${notification.enabled}")
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
+
+
