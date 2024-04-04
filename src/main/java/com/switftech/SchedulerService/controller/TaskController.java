@@ -1,5 +1,6 @@
 package com.switftech.SchedulerService.controller;
 
+import com.switftech.SchedulerService.dto.Request.EventRequest;
 import com.switftech.SchedulerService.service.ScheduleTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,8 @@ public class TaskController {
 
 
     @GetMapping("/schedule")
-    public ResponseEntity<String> scheduleTasks() {
-        ScheduleTaskService.scheduleTasks();
+    public ResponseEntity<String> scheduleEvents(EventRequest eventRequest) {
+        scheduleTaskService.scheduleEvent(eventRequest);
         return ResponseEntity.ok("Tasks scheduled successfully");
     }
 }

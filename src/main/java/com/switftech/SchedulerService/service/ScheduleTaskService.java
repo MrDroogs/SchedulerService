@@ -1,5 +1,7 @@
 package com.switftech.SchedulerService.service;
 
+import com.switftech.SchedulerService.dto.Request.EventRequest;
+
 public interface ScheduleTaskService {
     static void preprocess() {
     }
@@ -7,4 +9,6 @@ public interface ScheduleTaskService {
     static void scheduleTasks() {
 
     }
+
+    void scheduleEvent(EventRequest eventRequest);
 }

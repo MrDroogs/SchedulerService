@@ -17,13 +17,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class ScheduleTaskServiceImpl implements ScheduleTaskService {
-    private static Logger logger = LoggerFactory.getLogger(ScheduleTaskServiceImpl.class);
-
-
-
+    private static final Logger logger = LoggerFactory.getLogger(ScheduleTaskServiceImpl.class);
     private final Scheduler scheduler;
 
-
+    @Override
     public void scheduleEvent(EventRequest eventRequest) {
         try {
             ZonedDateTime dateTime = ZonedDateTime.of(eventRequest.getEventDateTime(), eventRequest.getTimeZone().toZoneId());

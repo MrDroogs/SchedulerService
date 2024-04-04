@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "scheduled_events")
+@Table(name = "scheduled")
 public class Event extends BaseAuditEntity {
 
 
